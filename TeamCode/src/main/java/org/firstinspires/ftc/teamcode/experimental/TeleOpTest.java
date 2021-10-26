@@ -8,6 +8,22 @@ public class TeleOpTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // run code here
+        waitForStart();
+
+        telemetry.setAutoClear(true);
+
+        DriveTrain driveTrain = DriveTrainImpl.builder(hardwareMap)
+                .setBackLeft("BL")
+                .setBackRight("BR")
+                .setFrontLeft("FL")
+                .setFrontRight("FR")
+                .build();
+
+        driveTrain.initialize();
+
+        while (opModeIsActive()) {
+
+        }
+
     }
 }
