@@ -43,6 +43,12 @@ public class DriveTrainImpl implements DriveTrain {
         performAction(motor -> motor.setMode(runMode));
     }
 
+    @Override
+    public void setPower(double motorPower) {
+        performAction(motor -> motor.setPower(motorPower));
+    }
+
+    @Override
     public void setPower(double flPower, double frPower, double blPower, double brPower) {
         frontLeft.setPower(flPower);
         frontRight.setPower(frPower);
