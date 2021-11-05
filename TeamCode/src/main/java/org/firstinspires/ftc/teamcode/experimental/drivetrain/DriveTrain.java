@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.experimental;
+package org.firstinspires.ftc.teamcode.experimental.drivetrain;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-public interface DriveTrain {
+import org.firstinspires.ftc.teamcode.experimental.RobotMechanism;
 
-    void initialize();
+public interface DriveTrain extends RobotMechanism {
 
     void setRunMode(DcMotor.RunMode mode);
 

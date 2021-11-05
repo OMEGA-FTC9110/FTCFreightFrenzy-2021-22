@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.experimental;
+package org.firstinspires.ftc.teamcode.experimental.drivetrain;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -40,7 +40,12 @@ public class DriveTrainImpl implements DriveTrain {
 
     @Override
     public void setRunMode(DcMotor.RunMode runMode) {
-        performAction(motor -> motor.setMode(runMode));
+        performAction(new MotorAction() {
+            @Override
+            public void perform(DcMotorEx motor) {
+                motor.setMode(runMode);
+            }
+        });
     }
 
     @Override
