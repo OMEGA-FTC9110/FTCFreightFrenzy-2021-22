@@ -40,12 +40,7 @@ public class DriveTrainImpl implements DriveTrain {
 
     @Override
     public void setRunMode(DcMotor.RunMode runMode) {
-        performAction(new MotorAction() {
-            @Override
-            public void perform(DcMotorEx motor) {
-                motor.setMode(runMode);
-            }
-        });
+        performAction(motor -> motor.setMode(runMode));
     }
 
     @Override
