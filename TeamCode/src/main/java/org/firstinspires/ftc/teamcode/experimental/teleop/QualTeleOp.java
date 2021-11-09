@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.experimental.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.experimental.drivetrain.DriveTrain;
 import org.firstinspires.ftc.teamcode.experimental.drivetrain.DriveTrainImpl;
@@ -8,7 +9,8 @@ import org.firstinspires.ftc.teamcode.experimental.intake.Intake;
 import org.firstinspires.ftc.teamcode.experimental.intake.IntakeImpl;
 import org.firstinspires.ftc.teamcode.util.MathUtils;
 
-public class MechTeleOpTest extends LinearOpMode {
+@TeleOp(name="Qual 1 TeleOp")
+public class QualTeleOp extends LinearOpMode {
 
     private double lx = 0.0;
     private double ly = 0.0;
