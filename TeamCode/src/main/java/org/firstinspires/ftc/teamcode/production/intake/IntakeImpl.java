@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.production.intake;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,12 +9,19 @@ import org.firstinspires.ftc.teamcode.util.ObjectUtils;
 
 public class IntakeImpl implements Intake {
 
+    private final DcMotorEx intakeLeft;
+    private final DcMotorEx intakeRight;
     private final DcMotorEx linearLeft;
     private final DcMotorEx linearRight;
 
-    private IntakeImpl(DcMotorEx linearLeft, DcMotorEx linearRight) {
+    private final CRServo servo;
+
+    private IntakeImpl(DcMotorEx intakeLeft, DcMotorEx intakeRight, DcMotorEx linearLeft, DcMotorEx linearRight, CRServo servo) {
+        this.intakeLeft = intakeLeft;
+        this.intakeRight = intakeRight;
         this.linearLeft = linearLeft;
         this.linearRight = linearRight;
+        this.servo = servo;
     }
 
     public static IntakeImpl.IntakeBuilder builder(HardwareMap hardwareMap) {
@@ -21,42 +29,77 @@ public class IntakeImpl implements Intake {
     }
 
     @Override
-    public void initialize() {
-        linearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+    public void initialize(boolean isAuto) {
+        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        linearRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
-    public void raiseSlides() {
-        setSlidePower(0.25);
-    }
-
-    @Override
-    public void lowerSlides() {
-        setSlidePower(-0.25);
-    }
-
-    private void setSlidePower(double power) {
-        if (!isBusy()) {
-            return;
-        }
-
-        linearRight.setPower(power);
+    public void setSlidePower(double power) {
         linearLeft.setPower(power);
+        linearRight.setPower(power);
     }
 
-    private boolean isBusy() {
-        return linearLeft.isBusy() || linearRight.isBusy();
+    @Override
+    public void activateIntake() {
+        setIntakePower(0.8);
+    }
+
+    @Override
+    public void stopIntake() {
+        setIntakePower(0.0);
+    }
+
+    @Override
+    public void reverseIntake() {
+        setIntakePower(-0.8);
+    }
+
+    @Override
+    public void toggleCarousel() {
+        servo.setPower(1.0);
+    }
+
+    @Override
+    public void toggleCarouselReverse() {
+        servo.setPower(-1.0);
+    }
+
+    @Override
+    public void stopCarousel() {
+        servo.setPower(0.0);
+    }
+
+    private void setIntakePower(double power) {
+        intakeLeft.setPower(power);
+        intakeRight.setPower(power);
     }
 
     public static class IntakeBuilder {
 
         private final HardwareMap hardwareMap;
 
-        private DcMotorEx linearRight;
+        private DcMotorEx intakeRight;
+        private DcMotorEx intakeLeft;
         private DcMotorEx linearLeft;
+        private DcMotorEx linearRight;
+
+        private CRServo servo;
 
         public IntakeBuilder(HardwareMap hardwareMap) {
             this.hardwareMap = hardwareMap;
+        }
+
+        public IntakeImpl.IntakeBuilder setIntakeRight(String intakeRight) {
+            this.intakeRight = getMotor(intakeRight);
+
+            return this;
+        }
+
+        public IntakeImpl.IntakeBuilder setIntakeLeft(String intakeLeft) {
+            this.intakeLeft = getMotor(intakeLeft);
+
+            return this;
         }
 
         public IntakeImpl.IntakeBuilder setLinearLeft(String linearLeft) {
@@ -71,10 +114,16 @@ public class IntakeImpl implements Intake {
             return this;
         }
 
-        public Intake build() {
-            ObjectUtils.requireNonNull(linearLeft, linearRight);
+        public IntakeImpl.IntakeBuilder setServo(String servoString) {
+            this.servo = hardwareMap.get(CRServo.class, servoString);
 
-            return new IntakeImpl(linearLeft, linearRight);
+            return this;
+        }
+
+        public Intake build() {
+            ObjectUtils.requireNonNull(intakeLeft, intakeRight, linearLeft, linearRight, servo);
+
+            return new IntakeImpl(intakeLeft, intakeRight, linearLeft, linearRight, servo);
         }
 
         private DcMotorEx getMotor(String motorName) {

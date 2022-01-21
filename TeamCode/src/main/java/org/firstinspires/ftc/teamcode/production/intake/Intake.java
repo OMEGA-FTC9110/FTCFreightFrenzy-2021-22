@@ -1,10 +1,21 @@
 package org.firstinspires.ftc.teamcode.production.intake;
 
-import org.firstinspires.ftc.teamcode.production.RobotMechanism;
+import org.firstinspires.ftc.teamcode.production.RobotModule;
 
-public interface Intake extends RobotMechanism {
+public interface Intake extends RobotModule {
 
-    void lowerSlides();
+    void setSlidePower(double power);
 
-    void raiseSlides();
+    void activateIntake();
+
+    void stopIntake();
+
+    void reverseIntake();
+
+    void toggleCarousel();
+
+    void toggleCarouselReverse();
+
+    void stopCarousel();
+
 }
