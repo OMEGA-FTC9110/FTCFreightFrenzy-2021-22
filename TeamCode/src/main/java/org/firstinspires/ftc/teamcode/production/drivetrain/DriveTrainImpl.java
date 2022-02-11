@@ -23,8 +23,10 @@ public class DriveTrainImpl implements DriveTrain {
     private final double WHEEL_DIAMETER_INCHES = 4;
     private final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
     private final double TICKS_PER_INCH = TICKS_PER_REV / WHEEL_CIRCUMFERENCE_INCHES;
+    private final double TICKS_PER_DEGREE = 3585.0 / 360.0;
 
-    private DriveTrainImpl(LinearOpMode opMode, DcMotorEx frontLeft, DcMotorEx frontRight, DcMotorEx backLeft, DcMotorEx backRight) {
+    private DriveTrainImpl(LinearOpMode opMode, DcMotorEx frontLeft, DcMotorEx frontRight,
+                           DcMotorEx backLeft, DcMotorEx backRight) {
         this.opMode = opMode;
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
@@ -42,6 +44,7 @@ public class DriveTrainImpl implements DriveTrain {
     public void initialize(boolean isAuto) {
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         if (isAuto) {
             setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -51,7 +54,6 @@ public class DriveTrainImpl implements DriveTrain {
         }
 
         opMode.telemetry.addLine("DriveTrain module initialized.");
-        opMode.telemetry.update();
     }
 
     @Override
@@ -88,10 +90,10 @@ public class DriveTrainImpl implements DriveTrain {
 
         setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         switch (direction) {
-            case FORWARD:
+            case BACKWARD:
                 setTargetPosition(target, 1, 1, 1, 1);
                 break;
-            case BACKWARD:
+            case FORWARD:
                 setTargetPosition(target, -1, -1, -1, -1);
                 break;
             case STRAFE_RIGHT:
@@ -117,12 +119,27 @@ public class DriveTrainImpl implements DriveTrain {
 
     @Override
     public void rotate(double angle) {
-
+        rotate(angle, 0.5);
     }
 
     @Override
     public void rotate(double angle, double power) {
+        double target = angle * TICKS_PER_DEGREE;
 
+        setRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setTargetPosition(target, -1, 1, -1, 1);
+
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while (isBusy()) {
+            setPower(power);
+        }
+
+        setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        setPower(0);
+
+        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
