@@ -25,6 +25,8 @@ public class QualTeleOpNew extends LinearOpMode {
     private double lt = 0.0;
     private double rt = 0.0;
 
+    private boolean isSlow = false;
+
     private double max = 0.0;
 
     @Override
@@ -36,7 +38,7 @@ public class QualTeleOpNew extends LinearOpMode {
                 .setFrontRight("FR")
                 .build();
 
-        Intake intake = IntakeImpl.builder(hardwareMap)
+        Intake intake = IntakeImpl.builder(this)
                 .setIntakeLeft("IL")
                 .setIntakeRight("IR")
                 .setLinearLeft("LL")
@@ -48,10 +50,11 @@ public class QualTeleOpNew extends LinearOpMode {
         intake.initialize(false);
 
         telemetry.setAutoClear(true);
+        telemetry.update();
         waitForStart();
 
         while (opModeIsActive()) {
-            lx = -gamepad1.left_stick_x;
+            lx = -gamepad1.left_stick_x * 1.1;
             ly = gamepad1.left_stick_y;
             rx = -gamepad1.right_stick_x;
 
@@ -60,21 +63,26 @@ public class QualTeleOpNew extends LinearOpMode {
             blPower = ly - lx + rx;
             brPower = ly + lx - rx;
 
+            max = Math.max(Math.max(Math.abs(flPower), Math.abs(frPower)),
+                    Math.max(Math.abs(blPower), Math.abs(brPower)));
+
+            isSlow = gamepad1.right_bumper;
+
             driveTrain.setPower(
-                    flPower /= max,
-                    frPower /= max,
-                    blPower /= max,
-                    brPower /= max
+                    (isSlow ? 0.25 : 1) * (flPower /= max),
+                    (isSlow ? 0.25 : 1) * (frPower /= max),
+                    (isSlow ? 0.25 : 1) * ( blPower /= max),
+                    (isSlow ? 0.25 : 1) * (brPower /= max)
             );
 
             rt = gamepad1.right_trigger;
             lt = gamepad1.left_trigger;
 
-            if (rt > 0.0 && lt == 0.0) {
+            if (rt > 0.2 && lt == 0.0) {
                 intake.setSlidePower(0.5);
             }
-            else if (lt > 0.0 && rt == 0.0) {
-                intake.setSlidePower(-0.5);
+            else if (lt > 0.2 && rt == 0.0) {
+                intake.setSlidePower(-0.2);
             }
             else {
                 intake.setSlidePower(0.0);
@@ -99,9 +107,6 @@ public class QualTeleOpNew extends LinearOpMode {
             else {
                 intake.stopCarousel();
             }
-
-            telemetry.addLine("Gamepad Y: " + gamepad1.y);
-            telemetry.addLine("Gamepad A: " + gamepad1.a);
 
             telemetry.update();
         }
