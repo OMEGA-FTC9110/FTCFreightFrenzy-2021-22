@@ -6,6 +6,8 @@ public interface Intake extends RobotModule {
 
     void setSlidePower(double power);
 
+    void setSlidePosition(double inches);
+
     void activateIntake();
 
     void stopIntake();
